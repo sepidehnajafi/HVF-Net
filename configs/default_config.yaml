@@ -1,0 +1,104 @@
+# =============================================================================
+# HVF-Net — Default Configuration
+# Values correspond to Table 2 of the paper. Override any field from the
+# command line, e.g.:
+#   python scripts/run_cv.py --config configs/default_config.yaml training.seed=7
+# =============================================================================
+
+experiment:
+  name: "hvf-net"
+  seed: 42
+  output_dir: "outputs/"
+
+data:
+  sampling_rate_hz: 500
+  epoch_duration_s: 2.0
+  epoch_overlap: 0.5
+  num_channels: 60
+  bands:
+    delta: [0.5, 4.0]
+    theta: [4.0, 8.0]
+    alpha: [8.0, 13.0]
+    beta: [13.0, 30.0]
+    gamma: [30.0, 45.0]
+
+hypergraph:
+  k_neighbors: 6                 # K nearest neighbors per node (Section 3.7.2)
+  node_embedding_dim: 64         # d
+  num_conv_layers: 2
+  activation: "relu"
+
+cnn3d:
+  num_blocks: 4
+  channel_progression: [16, 32, 64, 128]
+  kernel_size: [3, 3, 3]
+  stride: 1
+  padding: "same"
+  pool_kernel: [2, 2, 1]         # spatial-only pooling, frequency preserved
+  pool_stride: 2
+  pool_ceil_mode: true           # 15x15 -> 8x8 via ceil(15/2)
+  activation: "relu"
+  batch_norm: true
+
+spectral_stream:
+  token_dim: 5                   # one value per canonical band, per electrode
+  projection_dim: 64
+  positional_encoding: "learnable"
+
+transformer:
+  num_layers: 4
+  num_heads: 4
+  d_model: 256
+  d_k: 64
+  ffn_dim: 1024
+  ffn_activation: "relu"
+  attention_activation: "gelu"
+  dropout: 0.2
+  layer_norm: true
+  residual: true
+
+bcmi:
+  d_k: 16
+  gating: "sigmoid"
+  residual: true
+
+contrastive:
+  temperature: 0.07
+  lambda_max: 4.0
+  focusing_exponent: 2.0
+
+nisp:
+  active_during_training_only: true
+  noise_std:
+    delta: 0.15
+    theta: 0.18
+    alpha: 0.25
+    beta_hc: 0.22
+    beta_pd: 0.28
+    gamma: 0.10
+
+regularization:
+  dropout_head: 0.5
+  dropout_ffn: 0.2
+
+training:
+  optimizer: "adamw"
+  learning_rate: 1.0e-3
+  weight_decay: 1.0e-4
+  batch_size: 64
+  max_epochs: 30
+  early_stopping_patience: 8
+  lr_scheduler: "cosine_annealing"
+  class_weighting: true          # inverse class-frequency weighting
+  validation_split: 0.2
+
+evaluation:
+  protocol: "subject_independent_kfold"
+  num_folds: 10
+  metric_reporting: "mean_std"
+  accuracy_metric: "balanced_accuracy"
+
+permutation_test:
+  num_permutations: 200
+  full_retraining_per_fold: true
+  stratified_shuffle: true
