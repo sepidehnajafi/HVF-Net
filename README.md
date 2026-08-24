@@ -86,7 +86,7 @@ hvf-net/
 ## Installation
 
 ```bash
-git clone https://github.com/sepidehnajafi/hvf-net.git
+git clone https://github.com/sepidehnajafi/HVF-Net.git
 cd hvf-net
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
