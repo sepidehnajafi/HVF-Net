@@ -1,0 +1,10 @@
+torch==2.0.1
+numpy>=1.23,<2.0
+scipy>=1.9
+mne>=1.4
+scikit-learn>=1.2
+pyyaml>=6.0
+pandas>=1.5
+tqdm>=4.65
+matplotlib>=3.6
+tensorboard>=2.13
